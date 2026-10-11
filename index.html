@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Science Boxes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="viewport"><div id="world"></div></div>
+
+  <div id="results" hidden></div>
+  <div id="hud">
+    <input id="search" type="search" placeholder="Search topics…" autocomplete="off" spellcheck="false" aria-label="Search topics" aria-controls="results">
+    <label><span>Source</span>
+      <select id="source"></select>
+    </label>
+    <span id="coord">0, 0</span>
+    <button id="home" title="Back to origin (Home)">⌂</button>
+  </div>
+  <div id="hint">Drag, scroll or use the arrow keys · press / to search</div>
+
+  <script src="charts.js"></script>
+  <script src="decks.js"></script>
+  <script src="providers.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
