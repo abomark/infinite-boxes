@@ -13,13 +13,7 @@ function cellHash(x, y, salt = 0) {
   return (h ^ (h >>> 16)) >>> 0;
 }
 
-// --- Mix: each coordinate gets a source, stable per box ----------------------
-const mix = {
-  id: 'mix',
-  label: 'Mix',
-  load(x, y, signal) {
-    return GALLERIES[cellHash(x, y, 7) % GALLERIES.length].load(x, y, signal);
-  },
-};
+// --- Mix: every topic from every gallery on one lattice ----------------------
+const mix = makeGallery('mix', 'Mix', GALLERIES.flatMap(g => g.types));
 
 const PROVIDERS = [mix, ...GALLERIES];

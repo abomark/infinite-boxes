@@ -3145,8 +3145,32 @@ const { makeGallery, addTypes, galleries: GALLERIES } = (() => {
   const CATS = { chart: 'Chart', biz: 'Analytics', stats: 'Statistics', ts: 'Time series', causal: 'Causal', ml: 'ML', graph: 'Graphs', ai: 'AI', eng: 'Engineering', comm: 'Communication' };
   const LANGS = { sql: 'SQL', python: 'Python' };
   const kicker = type => `${type.tool || LANGS[type.lang] || CATS[type.cat || 'chart']} · ${type.family}`;
+  // Types sit on a lattice: index = (x + k·y) mod n, so each one repeats on a
+  // regular grid. latticeStep picks the k whose shortest repeat is longest
+  // (about √n boxes in every direction).
+  function latticeStep(n) {
+    let best = 1, bestD = -1, bestE = 0;
+    for (let k = 1; k < n; k++) {
+      let d = n, e = n * n;
+      for (let dy = 1; dy <= d; dy++) {
+        let dx = ((-k * dy) % n + n) % n;
+        if (dx > n / 2) dx -= n;
+        const c = Math.max(Math.abs(dx), dy), e2 = dx * dx + dy * dy;
+        if (c < d || (c === d && e2 < e)) { d = c; e = e2; }
+      }
+      if (d > bestD || (d === bestD && e > bestE)) { best = k; bestD = d; bestE = e; }
+    }
+    return best;
+  }
   function makeGallery(id, label, types) {
-    const typeAt = (x, y) => types[cellHash(x, y, 11) % types.length];
+    // Built lazily: decks.js adds types after the galleries exist. The shuffle
+    // keeps related topics from lining up side by side.
+    let n = 0, k = 1, order = [];
+    const seed = [...id].reduce((h, c) => cellHash(h, c.charCodeAt(0), 13), 0);
+    const typeAt = (x, y) => {
+      if (n !== types.length) { n = types.length; k = latticeStep(n); order = shuffle(types.slice(), rng(seed)); }
+      return order[((x + k * y) % n + n) % n];
+    };
     return {
       id,
       label,
